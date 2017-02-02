@@ -22,7 +22,7 @@ void UPositionReporte::BeginPlay()
 	FString objectName = (*GetOwner()).GetName();
 	FVector location = GetOwner()->GetActorLocation();	
 	FString objectPos = *FString::Printf(TEXT("X = %f, Y = %f"), location.X, location.Y);
-	UE_LOG(LogTemp, Warning, TEXT("%s is at %s"), *objectName, *objectPos)
+	UE_LOG(LogTemp, Warning, TEXT("%s is at %s"), *objectName, *objectPos);
 	
 }
 
