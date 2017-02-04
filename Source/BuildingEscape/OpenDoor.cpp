@@ -31,7 +31,7 @@ void UOpenDoor::SlideDoorOpen()
 	FQuat rotation = Owner->GetActorRotation().Quaternion();
 	if (rotation.Z > OpenAngle) {
 		rotation.Z -= .01;
-		UE_LOG(LogTemp, Warning, TEXT("rotation: %s"), *rotation.ToString());
+		//UE_LOG(LogTemp, Warning, TEXT("rotation: %s"), *rotation.ToString());
 		GetOwner()->SetActorRotation(rotation);
 	} 
 }
@@ -41,7 +41,7 @@ void UOpenDoor::SlideDoorClose()
 		FQuat rotation = Owner->GetActorRotation().Quaternion();
 		if (rotation.Z < InitialQuaternion.Z) {
 			rotation.Z += .01;
-			UE_LOG(LogTemp, Warning, TEXT("rotation: %s"), *rotation.ToString());
+			//UE_LOG(LogTemp, Warning, TEXT("rotation: %s"), *rotation.ToString());
 			GetOwner()->SetActorRotation(rotation);
 		}
 	}
