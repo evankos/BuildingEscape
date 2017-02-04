@@ -26,19 +26,26 @@ public:
 	void SlideDoorClose();
 
 private:
-		UPROPERTY(VisibleAnywhere)
+		UPROPERTY(EditAnywhere)
 		float OpenAngle = -0.45f;
 
 		UPROPERTY(EditAnywhere)
 		ATriggerVolume* PressurePlate;
 
+
 		
-		APawn* ActorThatOpens;
+		UPROPERTY(EditAnywhere)
+		float triggerMass = 50.f;
 
 		UPROPERTY(EditAnywhere)
 		float DoorCloseDelay = 0.3f;
+
 		FQuat InitialQuaternion;
 		float LastDoorOpenTime;
 		AActor* Owner;
+
+		TSet<AActor*> overlappingActors;
+
+		float GetTotalMassOnPlate();
 	
 };

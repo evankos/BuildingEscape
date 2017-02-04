@@ -20,10 +20,25 @@ void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
 	InitialQuaternion = GetOwner()->GetActorRotation().Quaternion();
 	Owner = GetOwner();
 	
+}
+
+
+
+// Called every frame
+void UOpenDoor::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
+{
+	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
+	
+	if (GetTotalMassOnPlate() > triggerMass) {
+		SlideDoorOpen();
+		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
+	}
+	else {
+		if (GetWorld()->GetTimeSeconds() > LastDoorOpenTime + DoorCloseDelay) SlideDoorClose();
+	}
 }
 
 void UOpenDoor::SlideDoorOpen()
@@ -33,7 +48,7 @@ void UOpenDoor::SlideDoorOpen()
 		rotation.Z -= .01;
 		//UE_LOG(LogTemp, Warning, TEXT("rotation: %s"), *rotation.ToString());
 		GetOwner()->SetActorRotation(rotation);
-	} 
+	}
 }
 void UOpenDoor::SlideDoorClose()
 {
@@ -46,19 +61,13 @@ void UOpenDoor::SlideDoorClose()
 		}
 	}
 }
-
-// Called every frame
-void UOpenDoor::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
-{
-	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
-	if (PressurePlate->IsOverlappingActor(ActorThatOpens)) {
-		SlideDoorOpen();
-		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
+float UOpenDoor::GetTotalMassOnPlate() {
+	float TotalMass = 0.f;
+	PressurePlate->GetOverlappingActors(overlappingActors);
+	for (AActor* overlappingActor : overlappingActors) {
+		TotalMass += overlappingActor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
+		UE_LOG(LogTemp, Warning, TEXT("Actor: %s"), *overlappingActor->GetName());
 	}
-	else {
-		if (GetWorld()->GetTimeSeconds() > LastDoorOpenTime + DoorCloseDelay) SlideDoorClose();
-	}
+	return TotalMass;
 }
-
-
 
