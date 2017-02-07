@@ -30,7 +30,7 @@ private:
 		float OpenAngle = -0.45f;
 
 		UPROPERTY(EditAnywhere)
-		ATriggerVolume* PressurePlate;
+		ATriggerVolume* PressurePlate=nullptr;
 
 
 		
@@ -42,7 +42,7 @@ private:
 
 		FQuat InitialQuaternion;
 		float LastDoorOpenTime;
-		AActor* Owner;
+		AActor* Owner=nullptr;
 
 		TSet<AActor*> overlappingActors;
 
