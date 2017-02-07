@@ -20,8 +20,10 @@ void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InitialQuaternion = GetOwner()->GetActorRotation().Quaternion();
-	Owner = GetOwner();
+	if(PressurePlate){
+		PressurePlate->OnActorBeginOverlap.AddDynamic(this, &UOpenDoor::OnOverlap);
+		PressurePlate->OnActorEndOverlap.AddDynamic(this,&UOpenDoor::OnOverlap);
+	}
 	
 }
 
@@ -32,41 +34,51 @@ void UOpenDoor::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompo
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 	
+}
+
+
+void UOpenDoor::OnOverlap(AActor* Actor, AActor* OtherActor)
+{
 	if (GetTotalMassOnPlate() > triggerMass) {
 		SlideDoorOpen();
-		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
 	}
 	else {
-		if (GetWorld()->GetTimeSeconds() > LastDoorOpenTime + DoorCloseDelay) SlideDoorClose();
+		SlideDoorClose();
 	}
 }
 
+
+
+
+
 void UOpenDoor::SlideDoorOpen()
 {
-	FQuat rotation = Owner->GetActorRotation().Quaternion();
-	if (rotation.Z > OpenAngle) {
-		rotation.Z -= .01;
-		//UE_LOG(LogTemp, Warning, TEXT("rotation: %s"), *rotation.ToString());
-		GetOwner()->SetActorRotation(rotation);
-	}
+	//FQuat rotation = Owner->GetActorRotation().Quaternion();
+	//if (rotation.Z > OpenAngle) {
+	//	rotation.Z = OpenAngle;
+	//	//UE_LOG(LogTemp, Warning, TEXT("rotation: %s"), *rotation.ToString());
+	//	GetOwner()->SetActorRotation(rotation);
+	//}
+	OnOpenRequest.Broadcast();
 }
 void UOpenDoor::SlideDoorClose()
 {
-	{
-		FQuat rotation = Owner->GetActorRotation().Quaternion();
-		if (rotation.Z < InitialQuaternion.Z) {
-			rotation.Z += .01;
-			//UE_LOG(LogTemp, Warning, TEXT("rotation: %s"), *rotation.ToString());
-			GetOwner()->SetActorRotation(rotation);
-		}
-	}
+
+	//FQuat rotation = Owner->GetActorRotation().Quaternion();
+	//if (rotation.Z < InitialQuaternion.Z) {
+	//	rotation.Z = InitialQuaternion.Z;
+	//	//UE_LOG(LogTemp, Warning, TEXT("rotation: %s"), *rotation.ToString());
+	//	GetOwner()->SetActorRotation(rotation);
+	//}
+	OnCloseRequest.Broadcast();
+
 }
 float UOpenDoor::GetTotalMassOnPlate() {
 	float TotalMass = 0.f;
 	PressurePlate->GetOverlappingActors(overlappingActors);
 	for (AActor* overlappingActor : overlappingActors) {
 		TotalMass += overlappingActor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
-		UE_LOG(LogTemp, Warning, TEXT("Actor: %s"), *overlappingActor->GetName());
+		//UE_LOG(LogTemp, Warning, TEXT("Actor: %s"), *overlappingActor->GetName());
 	}
 	return TotalMass;
 }

@@ -5,6 +5,8 @@
 #include "Components/ActorComponent.h"
 #include "OpenDoor.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSwingRequest);
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class BUILDINGESCAPE_API UOpenDoor : public UActorComponent
@@ -23,29 +25,32 @@ public:
 	// Called every frame
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
+	UFUNCTION()
+	void OnOverlap(AActor* Actor,AActor* OtherActor);
+
 	void SlideDoorClose();
 
-private:
-		UPROPERTY(EditAnywhere)
-		float OpenAngle = -0.45f;
+	UPROPERTY(BlueprintAssignable)
+	FOnSwingRequest OnOpenRequest;
 
-		UPROPERTY(EditAnywhere)
-		ATriggerVolume* PressurePlate=nullptr;
+	UPROPERTY(BlueprintAssignable)
+	FOnSwingRequest OnCloseRequest;
+
+private:
+
+	UPROPERTY(EditAnywhere)
+	ATriggerVolume* PressurePlate=nullptr;
+
 
 
 		
-		UPROPERTY(EditAnywhere)
-		float triggerMass = 50.f;
+	UPROPERTY(EditAnywhere)
+	float triggerMass = 22.f;
 
-		UPROPERTY(EditAnywhere)
-		float DoorCloseDelay = 0.3f;
+	AActor* Owner=nullptr;
 
-		FQuat InitialQuaternion;
-		float LastDoorOpenTime;
-		AActor* Owner=nullptr;
+	TSet<AActor*> overlappingActors;
 
-		TSet<AActor*> overlappingActors;
-
-		float GetTotalMassOnPlate();
+	float GetTotalMassOnPlate();
 	
 };
